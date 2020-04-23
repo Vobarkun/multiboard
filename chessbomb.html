@@ -52,6 +52,11 @@
         }
 
         $(document).ready(function () {
+            var urlParams = new URLSearchParams(window.location.search)
+            if (urlParams.has("n")) {
+                n = parseInt(urlParams.get("n")) 
+                paths = [paths[n-1]]
+            }
             // paths = []
             // for (i = 1; i < 20; i++) {
             //     paths.push(Array(i))
