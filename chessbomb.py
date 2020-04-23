@@ -6,7 +6,7 @@ def getGames():
     source = response.text
     source = source[source.find("cbConfigData") + len('cbConfigData="'):]
     source = source[:source.find('"')]
-    data = json.loads(base64.b64decode(source))
+    data = json.loads(base64.b64decode(source).decode("utf-8"))
 
     events = []
     weights = []
@@ -32,7 +32,7 @@ def getGames():
             source = response.text
             source = source[source.find("cbConfigData") + len('cbConfigData="'):]
             source = source[:source.find('"')]
-            data = json.loads(base64.b64decode(source))
+            data = json.loads(base64.b64decode(source).decode("utf-8"))
             games = data["roomData"]["games"]
             mr = 0
             for game in games:
@@ -48,7 +48,6 @@ def getGames():
 
     # with open("paths.js", "w") as f:
     #     f.write("paths = " + repr(paths) + ";")
-    print("paths = " + repr(paths) + ";")
     return "paths = " + repr(paths) + ";"
 
 
