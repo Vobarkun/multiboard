@@ -1,0 +1,83 @@
+<head>
+    <title>Multiboard</title>
+    <meta charset="utf-8"/>
+    <link rel="shortcut icon" type="image/png" href="https://www.chessbomb.com/favicon.ico" />
+    <style>
+        .container {
+            transform-origin: 0 0;
+            height: 0px;
+            text-align: center;
+        }
+        .crop {
+            width: 498px;
+            height: 716px;
+            overflow: hidden;
+            display: inline-block;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            margin-right: 6px;
+            margin-left: 6px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        iframe {
+            position: relative;
+            left: -2px;
+            top: -2px;
+            width: 800px;
+            height: 750px;
+            border: none;
+            overflow: hidden;
+        }
+        html {
+            scrollbar-width: none;
+            background-color: #272B30;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="paths.js"></script>
+    <script>
+        function adjustScale(c, l, last) {
+            sx = window.innerWidth / 510
+            sy = window.innerHeight / 735
+            height = Math.max(1, Math.floor(Math.sqrt(l / sx * sy * 1.966)))
+            maxwidth = Math.round(6 / 1920 * window.innerWidth)
+            width = Math.min(Math.ceil(l / height), maxwidth)
+            height = Math.ceil(l / width)
+            scale = Math.max(Math.min(sx / width**1.0105, sy / height), sx / maxwidth**1.0105)
+            c.css("transform", "scale(" + scale + ")")
+            c.css("width", window.innerWidth / scale + "px")
+            if (last) c.css("margin-bottom", 728 * height * scale + "px")
+            else c.css("margin-bottom", 50 + 728 * height * scale + "px")
+        }
+
+        $(document).ready(function () {
+            // paths = []
+            // for (i = 1; i < 20; i++) {
+            //     paths.push(Array(i))
+            // }
+            for (i = 0; i < paths.length; i++) {
+                $("body").append("<div class='container' id='container" + i + "'></div>")                
+                c = $("#container" + i)
+
+                l = paths[i].length
+                adjustScale(c, l, i==paths.length-1)
+
+                for (j = 0; j < l; j++) {
+                    // c.append("<div class='crop' style='background-color: dimgray'>"+l+"</div>")
+                    c.append("<div class='crop'><iframe src='https://www.chessbomb.com/arena/" + paths[i][j] + "?layout=e3&theme=slate&static=0' scrolling='no' frameborder='0'></iframe></div>")
+                }
+            }
+
+            window.onresize = function () {
+                for (i = 0; i < paths.length; i++) {
+                    adjustScale($("#container" + i), paths[i].length, i==paths.length-1)
+                }
+
+            }
+        });
+    </script>
+</head>
+
+<body>
+</body>
