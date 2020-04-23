@@ -12,7 +12,7 @@ def getGames():
     weights = []
     for room in data["indexData"]["rooms"]:
         d = datetime.strptime(room["endAt"], "%Y-%m-%dT%H:%M:%S.%fZ")
-        if d > datetime.now() and room["weight"] >= 70:
+        if d > datetime.now():
             events.append(room["slug"])
             weights.append(room["weight"])
 
@@ -21,7 +21,7 @@ def getGames():
     events = [events[p] for p in perm]
 
     paths = []
-    for event in events[0:n]:
+    for event in events:
         try: 
             response = requests.get("https://www.chessbomb.com/arena/" + event)
             source = response.text
