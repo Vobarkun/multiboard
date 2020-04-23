@@ -61,4 +61,4 @@ def mainsite():
 def paths():
     return getGames()
 
-run(host='localhost', port=8080)
+run(host='localhost', port=10001)
