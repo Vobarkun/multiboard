@@ -36,7 +36,8 @@ def getGames():
                     mr = r
             games = [game for game in games if int(re.sub("\D", "", game["roundSlug"])) == mr or game["result"] == "*"]
             games = sorted(games, key=(lambda j: int(j["board"])))
-            paths.append([event + "/" + game["roundSlug"] + "-" + game["slug"] for game in games])
+            if len(games) > 0:
+                paths.append([event + "/" + game["roundSlug"] + "-" + game["slug"] for game in games])
             print(str(event) + ": " + str(len(games)) + " games added")
         except Exception as e:
             print(event, e)
