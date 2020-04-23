@@ -48,10 +48,11 @@ def getGames():
 
     # with open("paths.js", "w") as f:
     #     f.write("paths = " + repr(paths) + ";")
+    print("paths = " + repr(paths) + ";")
     return "paths = " + repr(paths) + ";"
 
 
-from bottle import route, static_file, run
+from bottle import route, static_file, run, response
 
 @route("/")
 def mainsite():
@@ -59,6 +60,7 @@ def mainsite():
 
 @route('/paths.js')
 def paths():
+    response.content_type = 'text/javascript; charset=utf8'
     return getGames()
 
 run(host='0.0.0.0', port=10001)
