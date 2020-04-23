@@ -20,11 +20,6 @@ def getGames():
     perm.sort(key=lambda i:weights[i],reverse=True)    
     events = [events[p] for p in perm]
 
-    if len(sys.argv) > 1:
-        n = int(sys.argv[1])
-    else:
-        n = len(events)
-
     paths = []
     for event in events[0:n]:
         try: 
