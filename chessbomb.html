@@ -5,19 +5,45 @@
     <style>
         .container {
             transform-origin: 0 0;
-            height: 0px;
             text-align: center;
+            width: 100%;
+            margin-bottom: 6px;
+            margin-top: 6px;
         }
-        .crop {
-            width: 498px;
-            height: 716px;
+
+        .card {
+            margin-right: 5px;
+            margin-left: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
             overflow: hidden;
             display: inline-block;
+            position: relative;
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            margin-right: 6px;
-            margin-left: 6px;
-            margin-bottom: 12px;
-            border-radius: 4px;
+        }
+
+        .crop {
+            width: 497px;
+            height: 716px;
+            overflow: hidden;
+            transform-origin: 0 0;
+        }
+
+        .close {
+            text-align: center;
+            font-size: 300%;
+            width: 30px;
+            height: 44px;
+            top: -14;
+            right: 0;
+            position: absolute;
+            user-select: none;
+            opacity: 0;
+            background-color: firebrick;
+        }
+
+        .close:hover {
+            opacity: 1;
         }
 
         iframe {
@@ -37,18 +63,24 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="paths.js"></script>
     <script>
-        function adjustScale(c, l, last) {
+        function adjustScale() {
             sx = window.innerWidth / 510
             sy = window.innerHeight / 735
-            height = Math.max(1, Math.floor(Math.sqrt(l / sx * sy * 1.966)))
-            maxwidth = Math.round(6 / 1920 * window.innerWidth)
-            width = Math.min(Math.ceil(l / height), maxwidth)
-            height = Math.ceil(l / width)
-            scale = Math.max(Math.min(sx / width**1.0105, sy / height), sx / maxwidth**1.0105)
-            c.css("transform", "scale(" + scale + ")")
-            c.css("width", window.innerWidth / scale + "px")
-            if (last) c.css("margin-bottom", 728 * height * scale + "px")
-            else c.css("margin-bottom", 50 + 728 * height * scale + "px")
+            $(".container").each(function(index) {
+                children = $(this).children()
+                l = children.length
+                height = Math.max(1, Math.floor(Math.sqrt(l / sx * sy * 1.966)))
+                maxwidth = Math.round(6 / 1920 * window.innerWidth)
+                width = Math.min(Math.ceil(l / height), maxwidth)
+                height = Math.ceil(l / width)
+                scale = Math.max(Math.min(sx / width**1.0105, sy / height), sx / maxwidth**1.0105)
+
+                children.each(function(index) {
+                    $(this).children().css("transform", "scale(" + scale + ")")
+                    $(this).css("width", 497 * scale + "px")
+                    $(this).css("height", 716 * scale + "px")
+                });
+            });
         }
 
         $(document).ready(function () {
@@ -57,29 +89,25 @@
                 n = parseInt(urlParams.get("n")) 
                 paths = [paths[n-1]]
             }
-            // paths = []
-            // for (i = 1; i < 20; i++) {
-            //     paths.push(Array(i))
-            // }
             for (i = 0; i < paths.length; i++) {
                 $("body").append("<div class='container' id='container" + i + "'></div>")                
                 c = $("#container" + i)
 
                 l = paths[i].length
-                adjustScale(c, l, i==paths.length-1)
 
                 for (j = 0; j < l; j++) {
-                    // c.append("<div class='crop' style='background-color: dimgray'>"+l+"</div>")
-                    c.append("<div class='crop'><iframe src='https://www.chessbomb.com/arena/" + paths[i][j] + "?layout=e3&theme=slate&static=0' scrolling='no' frameborder='0'></iframe></div>")
+                    c.append(
+                        `<div class="card">
+                            <div class="crop">
+                                <iframe src="https://www.chessbomb.com/arena/${paths[i][j]}?layout=e3&theme=slate&static=0" scrolling="no" frameborder="0"></iframe>
+                                <div class="close" onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); adjustScale(); return false;">×</div>
+                            </div>
+                        </div>`
+                    )
                 }
+                adjustScale()
             }
-
-            window.onresize = function () {
-                for (i = 0; i < paths.length; i++) {
-                    adjustScale($("#container" + i), paths[i].length, i==paths.length-1)
-                }
-
-            }
+            window.onresize = adjustScale;
         });
     </script>
 </head>
