@@ -7,6 +7,11 @@
             transform-origin: 0 0;
             text-align: center;
             width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .container:last-child {
+            margin-bottom: 0px;
         }
 
         .card {
@@ -43,7 +48,7 @@
         }
 
         body {
-            margin: 0px;
+            margin: 5px;
         }
 
         iframe {
@@ -63,17 +68,34 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="paths.js"></script>
     <script>
+        const basewidth = 497;
+        const baseheight = 716;
+        const margin = 10
         function adjustScale() {
-            sx = window.innerWidth / 510
-            sy = window.innerHeight / 735
+            var width = window.innerWidth - 10;
+            var height = window.innerHeight - 10;
+
+            var scales = [];
+            for (var i = 1; i <= 6; i++) {
+                scales.push((width / i - margin) / basewidth)
+            }
+            for (var i = 1; i <= 3; i++) {
+                scales.push((height / i - margin) / baseheight)
+            }
+            scales.sort()
+
             $(".container").each(function(index) {
                 children = $(this).children()
                 l = children.length
-                height = Math.max(1, Math.floor(Math.sqrt(l / sx * sy * 1.966)))
-                maxwidth = Math.round(6 / 1920 * window.innerWidth)
-                width = Math.min(Math.ceil(l / height), maxwidth)
-                height = Math.ceil(l / width)
-                scale = Math.max(Math.min(sx / width**1.0105, sy / height), sx / maxwidth**1.0105)
+                
+                var scale = (width / Math.ceil(width / 1920 * 6) - margin) / basewidth;
+                for (s of scales) {
+                    if (s < 0.5) continue;
+                    n = Math.floor(height / (baseheight * s + margin)) * Math.floor(width / (basewidth * s + margin));
+                    if (n >= l) {
+                        scale = s;
+                    } else break;
+                }
 
                 children.each(function(index) {
                     $(this).children().css("transform", "scale(" + scale + ")")
@@ -89,6 +111,11 @@
                 n = parseInt(urlParams.get("n")) 
                 paths = [paths[n-1]]
             }
+            // paths = []
+            // for (var i = 1; i < 10; i++) {
+            //     paths.push(Array(i));
+            // }
+
             for (i = 0; i < paths.length; i++) {
                 $("body").append("<div class='container' id='container" + i + "'></div>")                
                 c = $("#container" + i)
@@ -104,6 +131,14 @@
                             </div>
                         </div>`
                     )
+                    // c.append(
+                    //     `<div class="card">
+                    //         <div class="crop">
+                    //             <iframe scrolling="no" frameborder="0" style="background-color: grey"></iframe>
+                    //             <div class="close" onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); adjustScale(); return false;">×</div>
+                    //         </div>
+                    //     </div>`
+                    // )
                 }
                 adjustScale()
             }
