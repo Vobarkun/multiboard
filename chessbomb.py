@@ -1,12 +1,16 @@
 import requests, base64, json, re, sys
 from datetime import datetime
 
-def getGames():
-    response = requests.get("https://www.chessbomb.com/arena/")
+def getChessbombJSON(url):
+    response = requests.get(url)
     source = response.text
     source = source[source.find("cbConfigData") + len('cbConfigData="'):]
     source = source[:source.find('"')]
     data = json.loads(base64.b64decode(source).decode("utf-8"))
+    return data
+
+def getGames():
+    data = getChessbombJSON("https://www.chessbomb.com/arena/")
 
     events = []
     weights = []
@@ -17,18 +21,15 @@ def getGames():
             weights.append(room["weight"])
 
     perm = list(range(0, len(events)))
-    perm.sort(key=lambda i:weights[i],reverse=True)    
+    perm.sort(key = lambda i:weights[i], reverse = True)    
     events = [events[p] for p in perm]
 
     paths = []
     for event in events:
-        try: 
-            response = requests.get("https://www.chessbomb.com/arena/" + event)
-            source = response.text
-            source = source[source.find("cbConfigData") + len('cbConfigData="'):]
-            source = source[:source.find('"')]
-            data = json.loads(base64.b64decode(source).decode("utf-8"))
+        try:
+            data = getChessbombJSON("https://www.chessbomb.com/arena/" + event)
             games = data["roomData"]["games"]
+            
             mr = 0
             for game in games:
                 r = int(re.sub("\D", "", game["roundSlug"]))
@@ -36,14 +37,14 @@ def getGames():
                     mr = r
             games = [game for game in games if int(re.sub("\D", "", game["roundSlug"])) == mr or game["result"] == "*"]
             games = sorted(games, key=(lambda j: int(j["board"])))
+            
             if len(games) > 0:
                 paths.append([event + "/" + game["roundSlug"] + "-" + game["slug"] for game in games])
             print(str(event) + ": " + str(len(games)) + " games added")
+        
         except Exception as e:
             print(event, e)
 
-    # with open("paths.js", "w") as f:
-    #     f.write("paths = " + repr(paths) + ";")
     return "paths = " + repr(paths) + ";"
 
 
