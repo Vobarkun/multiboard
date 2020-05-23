@@ -8,6 +8,7 @@
             text-align: center;
             width: 100%;
             margin-bottom: 20px;
+            display: inline-block;
         }
 
         .container:last-child {
@@ -49,6 +50,7 @@
 
         body {
             margin: 5px;
+            text-align: center;
         }
 
         iframe {
@@ -76,32 +78,30 @@
             var height = window.innerHeight - 10;
 
             var scales = [];
-            for (var i = 1; i <= 6; i++) {
-                scales.push((width / i - margin) / basewidth)
-            }
-            for (var i = 1; i <= 3; i++) {
-                scales.push((height / i - margin) / baseheight)
-            }
+            for (var i = 1; i <= 8; i++) scales.push((width / i - margin) / basewidth);
+            for (var i = 1; i <= 3; i++) scales.push((height / i - margin) / baseheight);
             scales.sort()
 
             $(".container").each(function(index) {
                 children = $(this).children()
                 l = children.length
                 
-                var scale = (width / Math.ceil(width / 1920 * 6) - margin) / basewidth;
-                for (s of scales) {
-                    if (s < 0.5) continue;
+                var scale = (width / Math.ceil(width / 1920 * 8) - margin) / basewidth;
+                for (var s of scales) {
+                    if (s * basewidth < 200) continue;
                     n = Math.floor(height / (baseheight * s + margin)) * Math.floor(width / (basewidth * s + margin));
                     if (n >= l) {
                         scale = s;
                     } else break;
                 }
 
-                children.each(function(index) {
-                    $(this).children().css("transform", "scale(" + scale + ")")
-                    $(this).css("width", 497 * scale + "px")
-                    $(this).css("height", 716 * scale + "px")
-                });
+                nrows = Math.floor(height / (baseheight * scale + margin));
+                ncols = Math.ceil(l / nrows);
+                $(this).css("width", Math.min((basewidth * scale + 10) * ncols + 5, width) + "px")
+                children.css("width", basewidth * scale + "px")
+                children.css("height", baseheight * scale + "px")
+                children.children().css("transform", "scale(" + scale + ")")
+                
             });
         }
 
@@ -111,10 +111,7 @@
                 n = parseInt(urlParams.get("n")) 
                 paths = [paths[n-1]]
             }
-            // paths = []
-            // for (var i = 1; i < 10; i++) {
-            //     paths.push(Array(i));
-            // }
+            // paths = ["2018-batumi-chess-olympiad"]
 
             for (i = 0; i < paths.length; i++) {
                 $("body").append("<div class='container' id='container" + i + "'></div>")                
